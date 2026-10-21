@@ -1,0 +1,19 @@
+project:
+  name: credit-card-fraud-detection
+  random_seed: 42
+data:
+  input_path: data/raw/creditcard.csv
+  target_column: Class
+  time_column: Time
+  amount_column: Amount
+split:
+  strategy: chronological
+  train_fraction: 0.60
+  validation_fraction: 0.20
+  test_fraction: 0.20
+  sort_tie_breaker: stable_original_row_order
+evaluation:
+  primary_metric: average_precision
+  secondary_metrics: [precision, recall, f1, roc_auc]
+models: [logistic_regression, decision_tree, random_forest]
+imbalance_strategies: [original, class_weighting, smote]

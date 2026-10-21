@@ -1,0 +1,6 @@
+{
+  "model": "Random Forest",
+  "strategy": "SMOTE",
+  "threshold": 0.5,
+  "selection_rationale": "Selected Random Forest with SMOTE at threshold 0.50 based on validation-set performance. It achieved an F1-score of 0.8431, precision of 95.56%, and recall of 75.44%, detecting 43 of 57 validation fraud cases with 2 false positives. Baseline Random Forest achieved the highest Average Precision of 0.7729, while SMOTE Random Forest achieved the highest F1-score and recall at threshold 0.50. This candidate was selected based on the validation results; the test set was not used for model selection."
+}
