@@ -1,1 +1,0 @@
-Place the existing EDA script here as `eda_credit_card_fraud.py`. Example invocation: `python src/01_eda/eda_credit_card_fraud.py --input data/raw/creditcard.csv --output outputs/eda` (confirm flags match the script).

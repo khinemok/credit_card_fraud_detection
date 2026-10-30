@@ -258,6 +258,46 @@ def analyze_amount(df):
     fig.savefig(FIGURES_DIR / "amount_distribution_log1p.png", dpi=160)
     plt.close(fig)
 
+    # Normalized comparison: each class integrates to approximately 1, so the
+    # minority fraud distribution remains visible despite the class imbalance.
+    fig, ax = plt.subplots(figsize=(10, 5.5))
+    amount_values = {}
+    colors = {0: "#3976c5", 1: "#c94b3c"}
+    labels = {0: "Legitimate", 1: "Fraud"}
+    for class_value, group in df.groupby(TARGET_COL):
+        values = np.log1p(group[AMOUNT_COL].clip(lower=0).dropna().to_numpy())
+        amount_values[class_value] = values
+        ax.hist(
+            values,
+            bins=60,
+            density=True,
+            alpha=0.55,
+            color=colors.get(class_value),
+            label=f"{labels.get(class_value, str(class_value))} (n={len(values):,})",
+        )
+
+    # Mark medians on the transformed x-axis, but label them in original currency.
+    median_x = {}
+    for class_value, values in amount_values.items():
+        original_median = float(df.loc[df[TARGET_COL] == class_value, AMOUNT_COL].median())
+        median_x[class_value] = float(np.log1p(max(original_median, 0)))
+        ax.axvline(
+            median_x[class_value],
+            color=colors.get(class_value),
+            linestyle="--",
+            linewidth=2,
+            label=f"{labels.get(class_value, str(class_value))} median: ${original_median:,.2f}",
+        )
+
+    ax.set_title("Transaction Amount by Class (each class normalised)")
+    ax.set_xlabel("log(1 + Amount)")
+    ax.set_ylabel("Density (within each class)")
+    ax.legend(loc="upper right")
+    ax.grid(axis="y", alpha=0.2)
+    fig.tight_layout()
+    fig.savefig(FIGURES_DIR / "amount_density_plot.png", dpi=160, bbox_inches="tight")
+    plt.close(fig)
+
     fig, ax = plt.subplots(figsize=(7, 5))
     values = [
         df.loc[df[TARGET_COL] == 0, AMOUNT_COL].dropna().to_numpy(),
@@ -399,6 +439,7 @@ Interpretation cautions:
 
 Tables: {TABLES_DIR}
 Figures: {FIGURES_DIR}
+Key amount comparison plot: {FIGURES_DIR / 'amount_density_plot.png'}
 """
     (OUTPUT_DIR / "EDA_README.txt").write_text(content, encoding="utf-8")
 
